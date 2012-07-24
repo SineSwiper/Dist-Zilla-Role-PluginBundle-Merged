@@ -21,7 +21,7 @@ with 'Dist::Zilla::Role::PluginBundle::Easy';
 
 has mvp_multivalue_args => (
   is       => 'ro',
-  isa      => ArrayRef,
+  isa      => 'ArrayRef',
   default  => sub { [] },
 );
 
@@ -60,7 +60,7 @@ sub add_merged {
 
 sub config_rename {
    my $self     = shift;
-   my $payload  = $self->payload
+   my $payload  = $self->payload;
    my $args     = dclone($payload);
    my $chg_list = ref $_[0] ? $_[0] : { @_ };
    
