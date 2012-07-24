@@ -1,0 +1,142 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Dist::Zilla::Role::MetaCPANInterfacer - something that will interact with MetaCPAN's API
+
+=head1 SYNOPSIS
+
+    # in your plugin/etc. code
+    with 'Dist::Zilla::Role::MetaCPANInterfacer';
+ 
+    my $obj = $self->mcpan->fetch(...);
+
+=head1 DESCRIPTION
+
+This role is simply gives you a L<MetaCPAN::API> object to use with caching, so
+that other plugins can share that cache.  It uses the awesome example provided in
+the L<MetaCPAN::API/SYNOPSIS>, contributed by Kent Fredric.
+
+=head1 ATTRIBUTES
+
+All of these attributes are f'ing lazy, because they like to sit around the house.
+They are also read-write, as this is a role, and you might want to change around 
+the defaults.
+
+=head2 mcpan
+
+=over
+
+=item *
+
+B<Type:> A L<MetaCPAN::API> object
+
+=item *
+
+B<Default:> A new object, using C<<< mcpan_ua >>> as the Tiny user agent
+
+=back
+
+=head2 mcpan_ua
+
+=over
+
+=item *
+
+B<Type:> A L<HTTP::Tiny> compatible user agent
+
+=item *
+
+B<Default:> A new L<HTTP::Tiny::Mech> object, using C<<< mcpan_mechua >>> as the Mechanized user agent
+
+=back
+
+=head2 mcpan_mechua
+
+=over
+
+=item *
+
+B<Type:> A L<WWW::Mechanize> compatible user agent
+
+=item *
+
+B<Default:> A new L<WWW::Mechanize::Cached::GZip> object, using C<<< mcpan_cache >>> as the cache attribute,
+and some UA string changes.
+
+=back
+
+=head2 mcpan_cache
+
+=over
+
+=item *
+
+B<Type:> A caching object
+
+=item *
+
+B<Default:> A new L<CHI> object, using the L<CHI::Driver::File|File> driver pointing to C<<< ~/.dzil/.webcache >>>
+
+=back
+
+=head1 TODO
+
+The caching stuff could potentially be split, but frankly, none of the existing 
+plugins really need caching all that much.  I've at least called the C<<< .webcache >>>
+directory a generic name, so feel free to re-use it.
+
+(Honestly, the only reason why this is a DZ module B<IS> the caching directory
+name...)
+
+=head1 SEE ALSO
+
+L<Dist::Zilla::PluginBundle::Prereqs>, which uses this quite a bit.
+
+=head1 AVAILABILITY
+
+The project homepage is L<https://github.com/SineSwiper/Dist-Zilla-Role-MetaCPANInterfacer/wiki>.
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
+site near you, or see L<https://metacpan.org/module/Dist::Zilla::Role::MetaCPANInterfacer/>.
+
+=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Internet Relay Chat
+
+You can get live help by using IRC ( Internet Relay Chat ). If you don't know what IRC is,
+please read this excellent guide: L<http://en.wikipedia.org/wiki/Internet_Relay_Chat>. Please
+be courteous and patient when talking to us, as we might be busy or sleeping! You can join
+those networks/channels and get help:
+
+=over 4
+
+=item *
+
+irc.perl.org
+
+You can connect to the server at 'irc.perl.org' and join this channel: #distzilla then talk to this person for help: SineSwiper.
+
+=back
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests via L<L<https://github.com/SineSwiper/Dist-Zilla-Role-MetaCPANInterfacer/issues>|GitHub>.
+
+=head1 AUTHOR
+
+Brendan Byrd <BBYRD@CPAN.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Brendan Byrd.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
