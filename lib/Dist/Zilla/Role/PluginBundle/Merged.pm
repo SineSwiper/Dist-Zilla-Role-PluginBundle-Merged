@@ -88,7 +88,7 @@ role {
       
       return $args;
    };
-}
+};
 
 42;
 
