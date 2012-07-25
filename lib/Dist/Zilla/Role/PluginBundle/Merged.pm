@@ -8,7 +8,6 @@ use MooseX::Role::Parameterized;
 
 use Class::Load;
 use Storable 'dclone';
-use Devel::SimpleTrace;
 
 use String::RewritePrefix 0.005 rewrite => {
    -as => '_section_class',
@@ -38,7 +37,7 @@ role {
       foreach my $name (@list) {
          my $class = _section_class($name);
          Class::Load::load_class($class);
-         @multi{$class->mvp_multivalue_args} = ();
+         @multi{$class->mvp_multivalue_args} = () if $class->can('mvp_multivalue_args');
       }
       
       return keys %multi;
@@ -61,6 +60,10 @@ role {
       
          my $class = _section_class($name);
          Class::Load::load_class($class);
+         
+         # handle mvp_aliases
+         my %aliases = ();
+         %aliases = %{$class->mvp_aliases} if $class->can('mvp_aliases');
 
          if ($name =~ /^\@/) {
             # just give it everything, since we can't separate them out
@@ -69,8 +72,7 @@ role {
          else {
             my %payload;
             foreach my $k (keys %$arg) {
-               warn "PAYLOAD = $k / $class / ".$class->does($k)."\n";
-               $payload{$k} = $arg->{$k} if $class->does($k);
+               $payload{$k} = $arg->{$k} if $class->can( $aliases{$k} || $k );
             }
             $self->add_plugins([ "=$class" => $name => \%payload ]);
          }

@@ -50,7 +50,6 @@ sub pmver {
 }
 
 eval { $v .= pmver('Class::Load','any version') };
-eval { $v .= pmver('Devel::SimpleTrace','any version') };
 eval { $v .= pmver('Dist::Zilla::Role::PluginBundle::Easy','any version') };
 eval { $v .= pmver('MooseX::Role::Parameterized','any version') };
 eval { $v .= pmver('String::RewritePrefix','0.005') };
