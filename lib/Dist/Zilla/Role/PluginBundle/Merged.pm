@@ -19,11 +19,11 @@ use String::RewritePrefix 0.005 rewrite => {
 
 with 'Dist::Zilla::Role::PluginBundle::Easy';
 
-# has mvp_multivalue_args => (
-  # is       => 'ro',
-  # isa      => 'ArrayRef',
-  # default  => sub { [] },
-# );
+has mvp_multivalue_args => (
+   is       => 'ro',
+   isa      => 'ArrayRef',
+   default  => sub { [] },
+);
 
 sub add_merged {
    my $self = shift;
