@@ -4,77 +4,89 @@ our $VERSION = '0.90'; # VERSION
 # ABSTRACT: Mindnumbingly easy way to create a PluginBundle
 
 use sanity;
-use Moose::Role;
-use MooseX::Types::Moose qw/ArrayRef/;
+use MooseX::Role::Parameterized;
 
-use Class::MOP;
-use Storable 'dclone';
-
-use String::RewritePrefix 0.005 rewrite => {
-   -as => '_section_class',
-   prefixes => {
-      ''  => 'Dist::Zilla::Plugin::',
-      '@' => 'Dist::Zilla::PluginBundle::',
-      '=' => ''
-   },
-};
-
-with 'Dist::Zilla::Role::PluginBundle::Easy';
-
-has mvp_multivalue_args => (
-   is       => 'ro',
-   isa      => ArrayRef,
-   lazy     => 1,
+parameter mv_plugins => (
+   isa      => 'ArrayRef[Str]',
+   required => 0,
    default  => sub { [] },
 );
 
-sub add_merged {
-   my $self = shift;
-   my @list = @_;
-   my $arg = $self->payload;
+role {
+   my $p = shift;
 
-   my %multi;
-   my @config;
-   foreach my $name (@list) {
-      if (ref $name) {
-         $arg = $name;
-         next;
-      }
-   
-      my $class = _section_class($name);
-      Class::MOP::load_class($class);
-      # @multi{$class->mvp_multivalue_args} = ();
+   use Class::Load;
+   use Storable 'dclone';
 
-      if ($name =~ /^\@/) {
-         # just give it everything, since we can't separate them out
-         $self->add_bundle($name => $arg);
+   use String::RewritePrefix 0.005 rewrite => {
+      -as => '_section_class',
+      prefixes => {
+         ''  => 'Dist::Zilla::Plugin::',
+         '@' => 'Dist::Zilla::PluginBundle::',
+         '=' => ''
+      },
+   };
+
+   with 'Dist::Zilla::Role::PluginBundle::Easy';
+
+   sub mvp_multivalue_args {
+      my @list = @{ $p->mv_plugins };
+      return unless @list;
+      
+      my %multi;
+      foreach my $name (@list) {
+         my $class = _section_class($name);
+         Class::Load::load_class($class);
+         @multi{$class->mvp_multivalue_args} = ();
       }
-      else {
-         my %payload;
-         foreach my $k (keys %$arg) {
-            $payload{$k} = $arg->{$k} if $class->does($k);
+      
+      return keys %multi;
+   };
+
+   sub add_merged {
+      my $self = shift;
+      my @list = @_;
+      my $arg = $self->payload;
+
+      my @config;
+      foreach my $name (@list) {
+         if (ref $name) {
+            $arg = $name;
+            next;
          }
-         $self->add_plugins([ "=$class" => $name => \%payload ]);
+      
+         my $class = _section_class($name);
+         Class::Load::load_class($class);
+
+         if ($name =~ /^\@/) {
+            # just give it everything, since we can't separate them out
+            $self->add_bundle($name => $arg);
+         }
+         else {
+            my %payload;
+            foreach my $k (keys %$arg) {
+               $payload{$k} = $arg->{$k} if $class->does($k);
+            }
+            $self->add_plugins([ "=$class" => $name => \%payload ]);
+         }
       }
    }
- 
-   # push @{$self->mvp_multivalue_args}, keys %multi;
-}
 
-sub config_rename {
-   my $self     = shift;
-   my $payload  = $self->payload;
-   my $args     = dclone($payload);
-   my $chg_list = ref $_[0] ? $_[0] : { @_ };
-   
-   foreach my $key (keys $chg_list) {
-      my $new_key = $chg_list->{$key};
-      my $val     = delete $args->{$key};
-      next unless ($new_key);
-      $args->{$new_key} = $val if (defined $val);
+   sub config_rename {
+      my $self     = shift;
+      my $payload  = $self->payload;
+      my $args     = dclone($payload);
+      my $chg_list = ref $_[0] ? $_[0] : { @_ };
+      
+      foreach my $key (keys $chg_list) {
+         my $new_key = $chg_list->{$key};
+         my $val     = delete $args->{$key};
+         next unless ($new_key);
+         $args->{$new_key} = $val if (defined $val);
+      }
+      
+      return $args;
    }
-   
-   return $args;
 }
 
 42;

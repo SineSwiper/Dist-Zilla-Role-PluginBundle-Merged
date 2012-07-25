@@ -18,10 +18,9 @@ my %WriteMakefileArgs = (
   "LICENSE" => "artistic_2",
   "NAME" => "Dist::Zilla::Role::PluginBundle::Merged",
   "PREREQ_PM" => {
-    "Class::MOP" => 0,
+    "Class::Load" => 0,
     "Dist::Zilla::Role::PluginBundle::Easy" => 0,
-    "Moose::Role" => 0,
-    "MooseX::Types::Moose" => 0,
+    "MooseX::Role::Parameterized" => 0,
     "String::RewritePrefix" => "0.005",
     "sanity" => 0
   },
