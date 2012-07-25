@@ -48,6 +48,9 @@ role {
       my $self = shift;
       my @list = @_;
       my $arg = $self->payload;
+      
+      use Data::Dumper;
+      warn Data::Dumper->new([$arg], [qw(arg)])->Maxdepth(5)->Dump();
 
       my @config;
       foreach my $name (@list) {
