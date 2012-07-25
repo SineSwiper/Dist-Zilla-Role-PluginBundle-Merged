@@ -28,10 +28,10 @@ parameter mv_plugins => (
 );
 
 role {
-   my $mvp = shift->mv_plugins;
+   my $p = shift;
 
-   sub mvp_multivalue_args {
-      my @list = @$mvp;
+   method mvp_multivalue_args => sub {
+      my @list = @{ $p->mv_plugins };
       return unless @list;
       
       my %multi;
@@ -44,7 +44,7 @@ role {
       return keys %multi;
    };
 
-   sub add_merged {
+   method add_merged => sub {
       my $self = shift;
       my @list = @_;
       my $arg = $self->payload;
@@ -73,7 +73,7 @@ role {
       }
    }
 
-   sub config_rename {
+   method config_rename => sub {
       my $self     = shift;
       my $payload  = $self->payload;
       my $args     = dclone($payload);
