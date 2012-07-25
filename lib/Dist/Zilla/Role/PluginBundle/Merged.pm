@@ -71,7 +71,7 @@ role {
             $self->add_plugins([ "=$class" => $name => \%payload ]);
          }
       }
-   }
+   };
 
    method config_rename => sub {
       my $self     = shift;
@@ -87,7 +87,7 @@ role {
       }
       
       return $args;
-   }
+   };
 }
 
 42;
