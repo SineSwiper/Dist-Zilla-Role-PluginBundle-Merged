@@ -6,6 +6,20 @@ our $VERSION = '0.90'; # VERSION
 use sanity;
 use MooseX::Role::Parameterized;
 
+use Class::Load;
+use Storable 'dclone';
+
+use String::RewritePrefix 0.005 rewrite => {
+   -as => '_section_class',
+   prefixes => {
+      ''  => 'Dist::Zilla::Plugin::',
+      '@' => 'Dist::Zilla::PluginBundle::',
+      '=' => ''
+   },
+};
+
+with 'Dist::Zilla::Role::PluginBundle::Easy';
+
 parameter mv_plugins => (
    isa      => 'ArrayRef[Str]',
    required => 0,
@@ -14,20 +28,6 @@ parameter mv_plugins => (
 
 role {
    my $p = shift;
-
-   use Class::Load;
-   use Storable 'dclone';
-
-   use String::RewritePrefix 0.005 rewrite => {
-      -as => '_section_class',
-      prefixes => {
-         ''  => 'Dist::Zilla::Plugin::',
-         '@' => 'Dist::Zilla::PluginBundle::',
-         '=' => ''
-      },
-   };
-
-   with 'Dist::Zilla::Role::PluginBundle::Easy';
 
    sub mvp_multivalue_args {
       my @list = @{ $p->mv_plugins };
