@@ -14,9 +14,16 @@ Dist::Zilla::Role::PluginBundle::Merged - Mindnumbingly easy way to create a Plu
     sub configure { shift->add_merged( qw[ Plugin1 Plugin2 Plugin3 Plugin4 ] ); }
  
     ; Or, as a more complex example...
+    package Dist::Zilla::PluginBundle::Foobar;
+    use Moose;
+ 
+    with 'Dist::Zilla::Role::PluginBundle::Merged' => {
+       mv_plugins => [ qw( Plugin1 =Dist::Zilla::Bizarro::Foobar Plugin2 ) ],
+    };
+ 
     sub configure {
        my $self = shift;
-       shift->add_merged(
+       $self->add_merged(
           qw( Plugin1 @Bundle1 =Dist::Zilla::Bizarro::Foobar ),
           {},  # force no options on the following plugins
           qw( ArglessPlugin1 ArglessPlugin2 ),
@@ -27,7 +34,7 @@ Dist::Zilla::Role::PluginBundle::Merged - Mindnumbingly easy way to create a Plu
 
 =head1 DESCRIPTION
 
-This is a PluginBundle role, based partially on a code example from L<Dist::Zilla::PluginBundle::Git>.
+This is a PluginBundle role, based partially on the underlying code from L<Dist::Zilla::PluginBundle::Git>.
 As you can see from the example above, it's incredibly easy to make a bundle from this role.  It uses
 L<Dist::Zilla::Role::PluginBundle::Easy>, so you have access to those same methods.
 
@@ -44,7 +51,7 @@ options:
     arg1 = blah
     arg2 = foobar
 
-Then it will pass the C<<< arg1 >>>E<sol>{arg2} options to each of the plugins, B<IF> they support the option.  
+Then it will pass the C<<< arg1/arg2 >>> options to each of the plugins, B<IF> they support the option.  
 Specifically, it does a C<<< $class->does($arg) >>> check.  (Bundles are passed the entire payload set.)  If
 C<<< arg1 >>> exists for multiple plugins, it will pass the same option to all of them.  If you need separate
 options, you should consider using the C<<< config_rename >>> method.
@@ -56,7 +63,7 @@ receives another replacement.
 
 =head2 config_rename
 
-This method is sort of like the C<<< [Dist::Zilla::Role::PluginBundle::Easy/config_slice|config_slice] >>> method,
+This method is sort of like the L<{Dist::Zilla::Role::PluginBundle::EasyE<sol>config_slice|config_slice}> method,
 but is more implicit than explicit.  It starts off with the entire payload (cloned), and renames any hash
 pair that was passed:
 
@@ -67,13 +74,39 @@ specific option for the plugin "Foobar" that doesn't clash with C<<< arg1 >>> on
 
     $self->add_merged(
        'Baz',
-       $self->config_rename(foobar_arg1 => 'arg1'),
+       $self->config_rename(foobar_arg1 => 'arg1', killme => ''),
        'Foobar',
     );
 
-Any destination options are replaced.  Also, if the hash value is undef (or non-true), the key will
+Any destination options are replaced.  Also, if the destination value is undef (or non-true), the key will
 simply be deleted.  Keep in mind that this is all a clone of the payload, so extra calls to this method
 will still start out with the original payload.
+
+=head1 ROLE PARAMETERS
+
+=head2 mv_plugins
+
+Certain configuration parameters are "multi-value" ones (or MVPs), and L<Config::MVP> uses the
+C<<< mvp_multivalue_args >>> sub in each class to identify which ones exist.  Since you are trying to merge the
+configuration parameters of multiple plugins, you'll need to make your new plugin bundle identify those
+same MVPs.
+
+Because the INI reader is closer to the beginning of the DZ plugin process, it would be too late for
+C<<< add_merged >>> to start adding in keys to your C<<< mvp_multivalue_args >>> array.  Thus, this role is parameterized
+with this single parameter, and comes with its own C<<< mvp_multivalue_args >>> method.  The syntax is a single
+arrayref of strings in the same prefix structure as C<<< add_merged >>>.  For example:
+
+    with 'Dist::Zilla::Role::PluginBundle::Merged' => {
+       mv_plugins => [ qw( Plugin1 Plugin2 ) ],
+    };
+
+The above will identify these two plugins has having MVPs.  When L<Config::MVP> calls your C<<< mvp_multivalue_args >>>
+sub (which is built into this role), it will load these two plugin classes and populate the contents
+of B<their> C<<< mvp_multivalue_args >>> sub as a combined list to pass over to L<Config::MVP>.  In other words,
+as long as you identify all of the plugins that would have multiple values, your stuff "just works".
+
+If you need to identify any extra parameters as MVPs (like your own custom MVPs or "dupe preventing" parameters
+that happen to be MVPs), you should consider combining C<<< mv_plugins >>> with an C<<< after mvp_multivalue_args >>> sub.
 
 =head1 AVAILABILITY
 

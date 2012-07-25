@@ -4,8 +4,9 @@ package Dist::Zilla::Role::PluginBundle::Merged;
 # ABSTRACT: Mindnumbingly easy way to create a PluginBundle
 
 use sanity;
-use Moose::Role;
-use Class::MOP;
+use MooseX::Role::Parameterized;
+
+use Class::Load;
 use Storable 'dclone';
 
 use String::RewritePrefix 0.005 rewrite => {
@@ -19,60 +20,78 @@ use String::RewritePrefix 0.005 rewrite => {
 
 with 'Dist::Zilla::Role::PluginBundle::Easy';
 
-has mvp_multivalue_args => (
-  is       => 'ro',
-  isa      => 'ArrayRef',
-  default  => sub { [] },
+parameter mv_plugins => (
+   isa      => 'ArrayRef[Str]',
+   required => 0,
+   default  => sub { [] },
 );
 
-sub add_merged {
-   my $self = shift;
-   my @list = @_;
-   my $arg = $self->payload;
+role {
+   my $p = shift;
 
-   my %multi;
-   my @config;
-   foreach my $name (@list) {
-      if (ref $name) {
-         $arg = $name;
-         next;
+   method mvp_multivalue_args => sub {
+      my @list = @{ $p->mv_plugins };
+      return unless @list;
+      
+      my %multi;
+      foreach my $name (@list) {
+         my $class = _section_class($name);
+         Class::Load::load_class($class);
+         @multi{$class->mvp_multivalue_args} = () if $class->can('mvp_multivalue_args');
       }
-   
-      my $class = _section_class($name);
-      Class::MOP::load_class($class);
-      @multi{$class->mvp_multivalue_args} = ();
+      
+      return keys %multi;
+   };
 
-      if ($name =~ /^\@/) {
-         # just give it everything, since we can't separate them out
-         $self->add_bundle($name => $arg);
-      }
-      else {
-         my %payload;
-         foreach my $k (keys %$arg) {
-            $payload{$k} = $arg->{$k} if $class->does($k);
+   method add_merged => sub {
+      my $self = shift;
+      my @list = @_;
+      my $arg = $self->payload;
+
+      my @config;
+      foreach my $name (@list) {
+         if (ref $name) {
+            $arg = $name;
+            next;
          }
-         $self->add_plugins([ "=$class" => $name => \%payload ]);
-      }
-   }
- 
-   push @{$self->mvp_multivalue_args}, keys %multi;
-}
+      
+         my $class = _section_class($name);
+         Class::Load::load_class($class);
+         
+         # handle mvp_aliases
+         my %aliases = ();
+         %aliases = %{$class->mvp_aliases} if $class->can('mvp_aliases');
 
-sub config_rename {
-   my $self     = shift;
-   my $payload  = $self->payload;
-   my $args     = dclone($payload);
-   my $chg_list = ref $_[0] ? $_[0] : { @_ };
-   
-   foreach my $key (keys $chg_list) {
-      my $new_key = $chg_list->{$key};
-      my $val     = delete $args->{$key};
-      next unless ($new_key);
-      $args->{$new_key} = $val if (defined $val);
-   }
-   
-   return $args;
-}
+         if ($name =~ /^\@/) {
+            # just give it everything, since we can't separate them out
+            $self->add_bundle($name => $arg);
+         }
+         else {
+            my %payload;
+            foreach my $k (keys %$arg) {
+               $payload{$k} = $arg->{$k} if $class->can( $aliases{$k} || $k );
+            }
+            $self->add_plugins([ "=$class" => $name => \%payload ]);
+         }
+      }
+   };
+
+   method config_rename => sub {
+      my $self     = shift;
+      my $payload  = $self->payload;
+      my $args     = dclone($payload);
+      my $chg_list = ref $_[0] ? $_[0] : { @_ };
+      
+      foreach my $key (keys $chg_list) {
+         my $new_key = $chg_list->{$key};
+         my $val     = delete $args->{$key};
+         next unless ($new_key);
+         $args->{$new_key} = $val if (defined $val);
+      }
+      
+      return $args;
+   };
+};
 
 42;
 
@@ -88,9 +107,16 @@ __END__
    sub configure { shift->add_merged( qw[ Plugin1 Plugin2 Plugin3 Plugin4 ] ); }
    
    ; Or, as a more complex example...
+   package Dist::Zilla::PluginBundle::Foobar;
+   use Moose;
+
+   with 'Dist::Zilla::Role::PluginBundle::Merged' => {
+      mv_plugins => [ qw( Plugin1 =Dist::Zilla::Bizarro::Foobar Plugin2 ) ],
+   };
+   
    sub configure {
       my $self = shift;
-      shift->add_merged(
+      $self->add_merged(
          qw( Plugin1 @Bundle1 =Dist::Zilla::Bizarro::Foobar ),
          {},  # force no options on the following plugins
          qw( ArglessPlugin1 ArglessPlugin2 ),
@@ -101,7 +127,7 @@ __END__
    
 = DESCRIPTION
 
-This is a PluginBundle role, based partially on a code example from [Dist::Zilla::PluginBundle::Git].
+This is a PluginBundle role, based partially on the underlying code from [Dist::Zilla::PluginBundle::Git].
 As you can see from the example above, it's incredibly easy to make a bundle from this role.  It uses
 [Dist::Zilla::Role::PluginBundle::Easy], so you have access to those same methods.
 
@@ -118,7 +144,7 @@ options:
    arg1 = blah
    arg2 = foobar
 
-Then it will pass the {arg1}/{arg2} options to each of the plugins, *IF* they support the option.  
+Then it will pass the {arg1/arg2} options to each of the plugins, *IF* they support the option.  
 Specifically, it does a {$class->does($arg)} check.  (Bundles are passed the entire payload set.)  If
 {arg1} exists for multiple plugins, it will pass the same option to all of them.  If you need separate
 options, you should consider using the {config_rename} method.
@@ -130,7 +156,7 @@ receives another replacement.
 
 == config_rename
 
-This method is sort of like the {[Dist::Zilla::Role::PluginBundle::Easy/config_slice|config_slice]} method,
+This method is sort of like the [{Dist::Zilla::Role::PluginBundle::Easy/config_slice|config_slice}] method,
 but is more implicit than explicit.  It starts off with the entire payload (cloned), and renames any hash
 pair that was passed:
 
@@ -141,12 +167,38 @@ specific option for the plugin "Foobar" that doesn't clash with {arg1} on plugin
 
    $self->add_merged(
       'Baz',
-      $self->config_rename(foobar_arg1 => 'arg1'),
+      $self->config_rename(foobar_arg1 => 'arg1', killme => ''),
       'Foobar',
    );
    
-Any destination options are replaced.  Also, if the hash value is undef (or non-true), the key will
+Any destination options are replaced.  Also, if the destination value is undef (or non-true), the key will
 simply be deleted.  Keep in mind that this is all a clone of the payload, so extra calls to this method
 will still start out with the original payload.
+
+= ROLE PARAMETERS
+
+== mv_plugins
+
+Certain configuration parameters are "multi-value" ones (or MVPs), and [Config::MVP] uses the
+{mvp_multivalue_args} sub in each class to identify which ones exist.  Since you are trying to merge the
+configuration parameters of multiple plugins, you'll need to make your new plugin bundle identify those
+same MVPs.
+
+Because the INI reader is closer to the beginning of the DZ plugin process, it would be too late for
+{add_merged} to start adding in keys to your {mvp_multivalue_args} array.  Thus, this role is parameterized
+with this single parameter, and comes with its own {mvp_multivalue_args} method.  The syntax is a single
+arrayref of strings in the same prefix structure as {add_merged}.  For example:
+
+   with 'Dist::Zilla::Role::PluginBundle::Merged' => {
+      mv_plugins => [ qw( Plugin1 Plugin2 ) ],
+   };
+
+The above will identify these two plugins has having MVPs.  When [Config::MVP] calls your {mvp_multivalue_args}
+sub (which is built into this role), it will load these two plugin classes and populate the contents
+of *their* {mvp_multivalue_args} sub as a combined list to pass over to [Config::MVP].  In other words,
+as long as you identify all of the plugins that would have multiple values, your stuff "just works".
+
+If you need to identify any extra parameters as MVPs (like your own custom MVPs or "dupe preventing" parameters
+that happen to be MVPs), you should consider combining {mv_plugins} with an {after mvp_multivalue_args} sub.
 
 =end wikidoc
