@@ -142,11 +142,6 @@
             "version" : "4.300020"
          },
          {
-            "class" : "Dist::Zilla::Plugin::RunExtraTests",
-            "name" : "RunExtraTests",
-            "version" : "0.007"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::NoTabsTests",
             "name" : "NoTabsTests",
             "version" : "0.01"
