@@ -5,6 +5,8 @@ our $VERSION = '0.90'; # VERSION
 
 use sanity;
 use Moose::Role;
+use MooseX::Types::Moose qw/ArrayRef/;
+
 use Class::MOP;
 use Storable 'dclone';
 
@@ -21,7 +23,7 @@ with 'Dist::Zilla::Role::PluginBundle::Easy';
 
 has mvp_multivalue_args => (
    is       => 'ro',
-   isa      => 'ArrayRef',
+   isa      => ArrayRef,
    default  => sub { [] },
 );
 

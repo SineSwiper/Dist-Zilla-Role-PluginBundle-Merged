@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
     "Class::MOP" => 0,
     "Dist::Zilla::Role::PluginBundle::Easy" => 0,
     "Moose::Role" => 0,
+    "MooseX::Types::Moose" => 0,
     "String::RewritePrefix" => "0.005",
     "sanity" => 0
   },
