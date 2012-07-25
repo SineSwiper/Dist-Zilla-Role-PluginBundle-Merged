@@ -132,6 +132,11 @@
             "version" : "4.300020"
          },
          {
+            "class" : "Dist::Zilla::Plugin::Test::Compile",
+            "name" : "Test::Compile",
+            "version" : "1.112820"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "PodSyntaxTests",
             "version" : "4.300020"

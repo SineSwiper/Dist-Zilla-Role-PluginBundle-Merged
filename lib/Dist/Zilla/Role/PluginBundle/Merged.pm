@@ -28,10 +28,10 @@ parameter mv_plugins => (
 );
 
 role {
-   my $p = shift;
+   my $mvp = shift->mv_plugins;
 
    sub mvp_multivalue_args {
-      my @list = @{ $p->mv_plugins };
+      my @list = @$mvp;
       return unless @list;
       
       my %multi;
