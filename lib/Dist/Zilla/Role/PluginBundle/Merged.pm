@@ -19,11 +19,11 @@ use String::RewritePrefix 0.005 rewrite => {
 
 with 'Dist::Zilla::Role::PluginBundle::Easy';
 
-has mvp_multivalue_args => (
-  is       => 'ro',
-  isa      => 'ArrayRef',
-  default  => sub { [] },
-);
+# has mvp_multivalue_args => (
+  # is       => 'ro',
+  # isa      => 'ArrayRef',
+  # default  => sub { [] },
+# );
 
 sub add_merged {
    my $self = shift;
@@ -40,7 +40,7 @@ sub add_merged {
    
       my $class = _section_class($name);
       Class::MOP::load_class($class);
-      @multi{$class->mvp_multivalue_args} = ();
+      # @multi{$class->mvp_multivalue_args} = ();
 
       if ($name =~ /^\@/) {
          # just give it everything, since we can't separate them out
@@ -55,7 +55,7 @@ sub add_merged {
       }
    }
  
-   push @{$self->mvp_multivalue_args}, keys %multi;
+   # push @{$self->mvp_multivalue_args}, keys %multi;
 }
 
 sub config_rename {
