@@ -69,6 +69,7 @@ role {
          else {
             my %payload;
             foreach my $k (keys %$arg) {
+               warn "PAYLOAD = $k / $class / ".$class->does($k)."\n";
                $payload{$k} = $arg->{$k} if $class->does($k);
             }
             $self->add_plugins([ "=$class" => $name => \%payload ]);
