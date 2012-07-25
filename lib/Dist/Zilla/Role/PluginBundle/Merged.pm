@@ -24,6 +24,7 @@ with 'Dist::Zilla::Role::PluginBundle::Easy';
 has mvp_multivalue_args => (
    is       => 'ro',
    isa      => ArrayRef,
+   lazy     => 1,
    default  => sub { [] },
 );
 
