@@ -9,7 +9,6 @@ README.html
 README.pod
 dist.ini
 lib/Dist/Zilla/Role/PluginBundle/Merged.pm
-t/00-compile.t
 t/000-report-versions-tiny.t
 weaver.ini
 xt/author/test-eol.t
