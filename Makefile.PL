@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Dist::Zilla::Role::PluginBundle::Merged",
   "PREREQ_PM" => {
     "Class::Load" => 0,
+    "Devel::SimpleTrace" => 0,
     "Dist::Zilla::Role::PluginBundle::Easy" => 0,
     "MooseX::Role::Parameterized" => 0,
     "String::RewritePrefix" => "0.005",

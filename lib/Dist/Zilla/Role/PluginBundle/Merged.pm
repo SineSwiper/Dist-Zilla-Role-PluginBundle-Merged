@@ -8,6 +8,7 @@ use MooseX::Role::Parameterized;
 
 use Class::Load;
 use Storable 'dclone';
+use Devel::SimpleTrace;
 
 use String::RewritePrefix 0.005 rewrite => {
    -as => '_section_class',
