@@ -28,7 +28,7 @@ prereqs:
 provides:
   Dist::Zilla::Role::PluginBundle::Merged:
     file: lib/Dist/Zilla/Role/PluginBundle/Merged.pm
-    version: 0.90
+    version: 0.91
 release_status: stable
 resources:
   bugtracker:
@@ -39,7 +39,7 @@ resources:
     url: git://github.com/SineSwiper/Dist-Zilla-Role-PluginBundle-Merged.git
     web: https://github.com/SineSwiper/Dist-Zilla-Role-PluginBundle-Merged
   x_irc: irc://irc.perl.org/#distzilla
-version: 0.90
+version: 0.91
 x_Dist_Zilla:
   plugins:
     -
@@ -141,7 +141,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PrereqsClean
       name: PrereqsClean
-      version: 1.00
+      version: 0.91
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
       name: CheckPrereqsIndexed

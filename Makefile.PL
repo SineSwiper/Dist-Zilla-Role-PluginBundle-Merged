@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "String::RewritePrefix" => "0.005",
     "sanity" => 0
   },
-  "VERSION" => "0.90",
+  "VERSION" => "0.91",
   "test" => {
     "TESTS" => "t/*.t"
   }
