@@ -19,12 +19,16 @@ no_index:
 prereqs:
   runtime:
     requires:
-      Class::Load: 0
-      Dist::Zilla::Role::PluginBundle::Easy: 0
-      MooseX::Role::Parameterized: 0
+      Class::Load: 0.01
+      Dist::Zilla::Role::PluginBundle::Easy: 2.101040
+      MooseX::Role::Parameterized: 0.01
       String::RewritePrefix: 0.005
       perl: v5.10.1
-      sanity: 0
+      sanity: 0.91
+  test:
+    requires:
+      Test::CheckDeps: 0.002
+      Test::UseAllModules: 0.10
 provides:
   Dist::Zilla::Role::PluginBundle::Merged:
     file: lib/Dist/Zilla/Role/PluginBundle/Merged.pm
@@ -123,9 +127,21 @@ x_Dist_Zilla:
       name: Test::EOL
       version: 0.07
     -
+      class: Dist::Zilla::Plugin::Test::CPAN::Meta::JSON
+      name: Test::CPAN::Meta::JSON
+      version: 0.003
+    -
+      class: Dist::Zilla::Plugin::Test::CheckDeps
+      name: Test::CheckDeps
+      version: 0.005
+    -
       class: Dist::Zilla::Plugin::Test::Portability
       name: Test::Portability
       version: 2.000003
+    -
+      class: Dist::Zilla::Plugin::Test::MinimumVersion
+      name: Test::MinimumVersion
+      version: 2.000002
     -
       class: Dist::Zilla::Plugin::ReportVersions::Tiny
       name: ReportVersions::Tiny
@@ -135,12 +151,32 @@ x_Dist_Zilla:
       name: Test::CheckManifest
       version: 0.03
     -
+      class: Dist::Zilla::Plugin::Test::DistManifest
+      name: Test::DistManifest
+      version: 2.000002
+    -
+      class: Dist::Zilla::Plugin::Test::UseAllModules
+      name: Test::UseAllModules
+      version: 0.002
+    -
+      class: Dist::Zilla::Plugin::Test::Version
+      name: Test::Version
+      version: 0.002004
+    -
       class: Dist::Zilla::Plugin::AutoPrereqs
-      name: AutoPrereqs
+      name: '@Prereqs/AutoPrereqs'
       version: 4.300020
     -
+      class: Dist::Zilla::Plugin::MinimumPerl
+      name: '@Prereqs/MinimumPerl'
+      version: 1.003
+    -
+      class: Dist::Zilla::Plugin::MinimumPrereqs
+      name: '@Prereqs/MinimumPrereqs'
+      version: 0.91
+    -
       class: Dist::Zilla::Plugin::PrereqsClean
-      name: PrereqsClean
+      name: '@Prereqs/PrereqsClean'
       version: 0.91
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed

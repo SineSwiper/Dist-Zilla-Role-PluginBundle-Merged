@@ -49,11 +49,13 @@ sub pmver {
     return sprintf('%-45s => %-10s%-15s%s', $module, $pmver, $wanted, "\n");
 }
 
-eval { $v .= pmver('Class::Load','any version') };
-eval { $v .= pmver('Dist::Zilla::Role::PluginBundle::Easy','any version') };
-eval { $v .= pmver('MooseX::Role::Parameterized','any version') };
+eval { $v .= pmver('Class::Load','0.01') };
+eval { $v .= pmver('Dist::Zilla::Role::PluginBundle::Easy','2.101040') };
+eval { $v .= pmver('MooseX::Role::Parameterized','0.01') };
 eval { $v .= pmver('String::RewritePrefix','0.005') };
-eval { $v .= pmver('sanity','any version') };
+eval { $v .= pmver('Test::CheckDeps','0.002') };
+eval { $v .= pmver('Test::UseAllModules','0.10') };
+eval { $v .= pmver('sanity','0.91') };
 
 
 # All done.
