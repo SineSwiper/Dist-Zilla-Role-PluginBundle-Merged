@@ -82,7 +82,7 @@ role {
       my $args     = dclone($payload);
       my $chg_list = ref $_[0] ? $_[0] : { @_ };
       
-      foreach my $key (keys $chg_list) {
+      foreach my $key (keys %$chg_list) {
          my $new_key = $chg_list->{$key};
          my $val     = delete $args->{$key};
          next unless ($new_key);
@@ -145,7 +145,7 @@ options:
    arg2 = foobar
 
 Then it will pass the {arg1/arg2} options to each of the plugins, *IF* they support the option.  
-Specifically, it does a {$class->does($arg)} check.  (Bundles are passed the entire payload set.)  If
+Specifically, it does a {$class->can($arg)} check.  (Bundles are passed the entire payload set.)  If
 {arg1} exists for multiple plugins, it will pass the same option to all of them.  If you need separate
 options, you should consider using the {config_rename} method.
 
@@ -156,7 +156,7 @@ receives another replacement.
 
 == config_rename
 
-This method is sort of like the [{Dist::Zilla::Role::PluginBundle::Easy/config_slice|config_slice}] method,
+This method is sort of like the { [config_slice|Dist::Zilla::Role::PluginBundle::Easy/config_slice] } method,
 but is more implicit than explicit.  It starts off with the entire payload (cloned), and renames any hash
 pair that was passed:
 
@@ -181,7 +181,7 @@ will still start out with the original payload.
 
 Certain configuration parameters are "multi-value" ones (or MVPs), and [Config::MVP] uses the
 {mvp_multivalue_args} sub in each class to identify which ones exist.  Since you are trying to merge the
-configuration parameters of multiple plugins, you'll need to make your new plugin bundle identify those
+configuration parameters of multiple plugins, you'll need to make your new plugin bundle identifies those
 same MVPs.
 
 Because the INI reader is closer to the beginning of the DZ plugin process, it would be too late for
