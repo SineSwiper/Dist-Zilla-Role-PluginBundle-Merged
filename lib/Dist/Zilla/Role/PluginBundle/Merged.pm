@@ -82,7 +82,7 @@ role {
       my $args     = dclone($payload);
       my $chg_list = ref $_[0] ? $_[0] : { @_ };
       
-      foreach my $key (keys $chg_list) {
+      foreach my $key (keys %$chg_list) {
          my $new_key = $chg_list->{$key};
          my $val     = delete $args->{$key};
          next unless ($new_key);

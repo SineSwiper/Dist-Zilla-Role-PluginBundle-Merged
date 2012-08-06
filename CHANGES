@@ -1,6 +1,15 @@
 Revision History for Dist-Zilla-Role-PluginBundle-Merged
 ========================================================
 
+v0.91 2012-08-06
+----------------
+
+commit 241cf22c75a10fffc7295bf5ed56fbea79dcbaf8
+Author: SineSwiper <BBYRD@CPAN.org>
+Date:   Wed Aug 1 09:07:30 2012 -0400
+
+    Fix "keys $hash" bug that only impacted older Perls
+
 ===================================
 End of changes in the last 365 days
 ===================================
