@@ -1,8 +1,23 @@
 Revision History for Dist-Zilla-Role-PluginBundle-Merged
 ========================================================
 
+v0.92 2013-02-28
+----------------
+
+commit 465e70b3ba1db8eb6fa1ff130b419d47d4055160
+Author: Brendan Byrd <Perl@ResonatorSoft.org>
+Date:   Thu Feb 28 08:31:47 2013 -0500
+
+    Fix docs
+
 v0.91 2012-08-06
 ----------------
+
+commit 8d7ac789aa61213c45b3bbc0929596722e3849a3
+Author: SineSwiper <BBYRD@CPAN.org>
+Date:   Mon Aug 6 12:04:48 2012 -0400
+
+    Release v0.91
 
 commit 241cf22c75a10fffc7295bf5ed56fbea79dcbaf8
 Author: SineSwiper <BBYRD@CPAN.org>

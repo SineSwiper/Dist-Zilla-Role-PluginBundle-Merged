@@ -1,6 +1,6 @@
 package Dist::Zilla::Role::PluginBundle::Merged;
 
-our $VERSION = '0.91'; # VERSION
+our $VERSION = '0.92'; # VERSION
 # ABSTRACT: Mindnumbingly easy way to create a PluginBundle
 
 use sanity;
@@ -32,14 +32,14 @@ role {
    method mvp_multivalue_args => sub {
       my @list = @{ $p->mv_plugins };
       return unless @list;
-      
+
       my %multi;
       foreach my $name (@list) {
          my $class = _section_class($name);
          Class::Load::load_class($class);
          @multi{$class->mvp_multivalue_args} = () if $class->can('mvp_multivalue_args');
       }
-      
+
       return keys %multi;
    };
 
@@ -54,10 +54,10 @@ role {
             $arg = $name;
             next;
          }
-      
+
          my $class = _section_class($name);
          Class::Load::load_class($class);
-         
+
          # handle mvp_aliases
          my %aliases = ();
          %aliases = %{$class->mvp_aliases} if $class->can('mvp_aliases');
@@ -81,14 +81,14 @@ role {
       my $payload  = $self->payload;
       my $args     = dclone($payload);
       my $chg_list = ref $_[0] ? $_[0] : { @_ };
-      
+
       foreach my $key (keys %$chg_list) {
          my $new_key = $chg_list->{$key};
          my $val     = delete $args->{$key};
          next unless ($new_key);
          $args->{$new_key} = $val if (defined $val);
       }
-      
+
       return $args;
    };
 };
@@ -107,12 +107,12 @@ Dist::Zilla::Role::PluginBundle::Merged - Mindnumbingly easy way to create a Plu
 
 =head1 SYNOPSIS
 
-    ; Yes, three lines of code works!
+    # Yes, three lines of code works!
     package Dist::Zilla::PluginBundle::Foobar;
     Moose::with 'Dist::Zilla::Role::PluginBundle::Merged';
     sub configure { shift->add_merged( qw[ Plugin1 Plugin2 Plugin3 Plugin4 ] ); }
  
-    ; Or, as a more complex example...
+    # Or, as a more complex example...
     package Dist::Zilla::PluginBundle::Foobar;
     use Moose;
  
@@ -150,19 +150,19 @@ options:
     arg1 = blah
     arg2 = foobar
 
-Then it will pass the C<<< arg1/arg2 >>> options to each of the plugins, B<IF> they support the option.  
+Then it will pass the C<<< arg1/arg2 >>> options to each of the plugins, B<IF> they support the option.
 Specifically, it does a C<<< $class->can($arg) >>> check.  (Bundles are passed the entire payload set.)  If
 C<<< arg1 >>> exists for multiple plugins, it will pass the same option to all of them.  If you need separate
 options, you should consider using the C<<< config_rename >>> method.
 
 It will also accept hashrefs anywhere in the list, which will replace the payload arguments while
-it processes.  This is useful for changing the options "on-the-fly" as plugins get processed.  The 
+it processes.  This is useful for changing the options "on-the-fly" as plugins get processed.  The
 replacement is done in order, and the changes will persist until it reaches the end of the list, or
 receives another replacement.
 
 =head2 config_rename
 
-This method is sort of like the C<<<  [config_slice|Dist::Zilla::Role::PluginBundle::Easy/config_slice]  >>> method,
+This method is sort of like the L<config_slice|Dist::Zilla::Role::PluginBundle::Easy/config_slice> method,
 but is more implicit than explicit.  It starts off with the entire payload (cloned), and renames any hash
 pair that was passed:
 
@@ -187,7 +187,7 @@ will still start out with the original payload.
 
 Certain configuration parameters are "multi-value" ones (or MVPs), and L<Config::MVP> uses the
 C<<< mvp_multivalue_args >>> sub in each class to identify which ones exist.  Since you are trying to merge the
-configuration parameters of multiple plugins, you'll need to make your new plugin bundle identifies those
+configuration parameters of multiple plugins, you'll need to make sure your new plugin bundle identifies those
 same MVPs.
 
 Because the INI reader is closer to the beginning of the DZ plugin process, it would be too late for
@@ -246,7 +246,7 @@ Brendan Byrd <BBYRD@CPAN.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 by Brendan Byrd.
+This software is Copyright (c) 2013 by Brendan Byrd.
 
 This is free software, licensed under:
 
