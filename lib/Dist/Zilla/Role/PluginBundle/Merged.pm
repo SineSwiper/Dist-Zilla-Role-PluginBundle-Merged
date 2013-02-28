@@ -32,14 +32,14 @@ role {
    method mvp_multivalue_args => sub {
       my @list = @{ $p->mv_plugins };
       return unless @list;
-      
+
       my %multi;
       foreach my $name (@list) {
          my $class = _section_class($name);
          Class::Load::load_class($class);
          @multi{$class->mvp_multivalue_args} = () if $class->can('mvp_multivalue_args');
       }
-      
+
       return keys %multi;
    };
 
@@ -54,10 +54,10 @@ role {
             $arg = $name;
             next;
          }
-      
+
          my $class = _section_class($name);
          Class::Load::load_class($class);
-         
+
          # handle mvp_aliases
          my %aliases = ();
          %aliases = %{$class->mvp_aliases} if $class->can('mvp_aliases');
@@ -81,14 +81,14 @@ role {
       my $payload  = $self->payload;
       my $args     = dclone($payload);
       my $chg_list = ref $_[0] ? $_[0] : { @_ };
-      
+
       foreach my $key (keys %$chg_list) {
          my $new_key = $chg_list->{$key};
          my $val     = delete $args->{$key};
          next unless ($new_key);
          $args->{$new_key} = $val if (defined $val);
       }
-      
+
       return $args;
    };
 };
@@ -100,20 +100,20 @@ __END__
 =begin wikidoc
 
 = SYNOPSIS
- 
-   ; Yes, three lines of code works!
+
+   # Yes, three lines of code works!
    package Dist::Zilla::PluginBundle::Foobar;
    Moose::with 'Dist::Zilla::Role::PluginBundle::Merged';
    sub configure { shift->add_merged( qw[ Plugin1 Plugin2 Plugin3 Plugin4 ] ); }
-   
-   ; Or, as a more complex example...
+
+   # Or, as a more complex example...
    package Dist::Zilla::PluginBundle::Foobar;
    use Moose;
 
    with 'Dist::Zilla::Role::PluginBundle::Merged' => {
       mv_plugins => [ qw( Plugin1 =Dist::Zilla::Bizarro::Foobar Plugin2 ) ],
    };
-   
+
    sub configure {
       my $self = shift;
       $self->add_merged(
@@ -124,7 +124,7 @@ __END__
          qw( Plugin2 ),
       );
    }
-   
+
 = DESCRIPTION
 
 This is a PluginBundle role, based partially on the underlying code from [Dist::Zilla::PluginBundle::Git].
@@ -144,24 +144,24 @@ options:
    arg1 = blah
    arg2 = foobar
 
-Then it will pass the {arg1/arg2} options to each of the plugins, *IF* they support the option.  
+Then it will pass the {arg1/arg2} options to each of the plugins, *IF* they support the option.
 Specifically, it does a {$class->can($arg)} check.  (Bundles are passed the entire payload set.)  If
 {arg1} exists for multiple plugins, it will pass the same option to all of them.  If you need separate
 options, you should consider using the {config_rename} method.
 
 It will also accept hashrefs anywhere in the list, which will replace the payload arguments while
-it processes.  This is useful for changing the options "on-the-fly" as plugins get processed.  The 
+it processes.  This is useful for changing the options "on-the-fly" as plugins get processed.  The
 replacement is done in order, and the changes will persist until it reaches the end of the list, or
 receives another replacement.
 
 == config_rename
 
-This method is sort of like the { [config_slice|Dist::Zilla::Role::PluginBundle::Easy/config_slice] } method,
+This method is sort of like the [config_slice|Dist::Zilla::Role::PluginBundle::Easy/config_slice] method,
 but is more implicit than explicit.  It starts off with the entire payload (cloned), and renames any hash
 pair that was passed:
 
    my $hash = $self->config_rename(foobar_arg1 => 'arg1');
-   
+
 This example will change the argument {foobar_arg1} to {arg1}.  This is handy if you want to make a
 specific option for the plugin "Foobar" that doesn't clash with {arg1} on plugin "Baz":
 
@@ -170,7 +170,7 @@ specific option for the plugin "Foobar" that doesn't clash with {arg1} on plugin
       $self->config_rename(foobar_arg1 => 'arg1', killme => ''),
       'Foobar',
    );
-   
+
 Any destination options are replaced.  Also, if the destination value is undef (or non-true), the key will
 simply be deleted.  Keep in mind that this is all a clone of the payload, so extra calls to this method
 will still start out with the original payload.
@@ -181,7 +181,7 @@ will still start out with the original payload.
 
 Certain configuration parameters are "multi-value" ones (or MVPs), and [Config::MVP] uses the
 {mvp_multivalue_args} sub in each class to identify which ones exist.  Since you are trying to merge the
-configuration parameters of multiple plugins, you'll need to make your new plugin bundle identifies those
+configuration parameters of multiple plugins, you'll need to make sure your new plugin bundle identifies those
 same MVPs.
 
 Because the INI reader is closer to the beginning of the DZ plugin process, it would be too late for
