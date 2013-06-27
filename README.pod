@@ -180,7 +180,7 @@ it knows that you really want to use that argument.  Others will not.
 
 =item *
 
-Doing things more implicitly grants greater flexibility at the cost of control.  YMMV.
+Doing things more implicitly grants greater flexibility while sacrificing control.  YMMV.
 
 =back
 
