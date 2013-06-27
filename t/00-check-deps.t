@@ -1,7 +1,7 @@
-use Test::More 0.88;
-use Test::CheckDeps;
+use Test::More 0.94;
+use Test::CheckDeps 0.004;
 
-check_dependencies();
+check_dependencies('classic');
 
 if (0) {
     BAIL_OUT("Missing dependencies") if !Test::More->builder->is_passing;

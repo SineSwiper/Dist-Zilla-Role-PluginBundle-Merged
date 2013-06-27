@@ -1,3 +1,4 @@
+.travis.yml
 CHANGES
 INSTALL
 LICENSE
@@ -5,15 +6,13 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
+README
 README.html
-README.pod
 dist.ini
 lib/Dist/Zilla/Role/PluginBundle/Merged.pm
 t/00-check-deps.t
 t/00-compile.t
-t/00-load.t
-t/000-report-versions-tiny.t
-weaver.ini
+t/00-report-prereqs.t
 xt/author/test-eol.t
 xt/release/check-manifest.t
 xt/release/dist-manifest.t
