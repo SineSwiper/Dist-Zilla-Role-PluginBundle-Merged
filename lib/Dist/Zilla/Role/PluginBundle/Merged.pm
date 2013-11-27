@@ -72,7 +72,7 @@ role {
 
          # check mv_plugins list to make sure the class was passed
          unless (grep { $_ eq $name } @{ $p->mv_plugins }) {
-            say $self->_fake_log_prefix." $name has MVPs, but was never passed in the mv_plugins list"
+            warn $self->_fake_log_prefix." $name has MVPs, but was never passed in the mv_plugins list\n"
                if ($class->can('mvp_multivalue_args') and scalar($class->mvp_multivalue_args));
          }
 
@@ -127,7 +127,7 @@ role {
          %aliases = %{$class->mvp_aliases} if $class->can('mvp_aliases');
 
          foreach my $k (keys %$config_hash) {
-            say $self->_fake_log_prefix." $name doesn't support argument '$k' as a standard attribute.  (Maybe you should use explicit arg passing?)"
+            warn $self->_fake_log_prefix." $name doesn't support argument '$k' as a standard attribute.  (Maybe you should use explicit arg passing?)\n"
                unless $class->can( $aliases{$k} || $k );
          }
       }
